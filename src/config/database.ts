@@ -1,9 +1,19 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('SystemDB', 'admin', 'admin', {
+// Configuração principal para o banco de dados SystemDB
+const sequelizeMaster = new Sequelize('SystemDB', 'admin', 'admin', {
   host: 'localhost',
   dialect: 'mssql',
-  logging: false, 
+  logging: false,
 });
 
-export default sequelize;
+// Função para criar a conexão para um banco de dados específico
+const useDatabase = (databaseName: string) => {
+  return new Sequelize(databaseName, 'admin', 'admin', {
+    host: 'localhost',
+    dialect: 'mssql',
+    logging: false,
+  });
+};
+
+export { sequelizeMaster, useDatabase };
