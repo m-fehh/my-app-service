@@ -34,8 +34,6 @@ const createDatabaseIfNotExists = async (databaseName: string, schemaName: strin
 
 // Função para sincronizar tabelas
 const syncDatabase = async (sequelize: Sequelize) => {
-    console.log("sequelize: ", sequelize);
-
   try {
     // Sincronizar os modelos e tabelas
     await sequelize.sync({ alter: true });
