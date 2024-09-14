@@ -4,6 +4,6 @@ import userRoutes from './entities/user.route';
 const router = Router();
 
 // Definindo as rotas
-router.use('/users', userRoutes);
+router.use(userRoutes);
 
 export default router;

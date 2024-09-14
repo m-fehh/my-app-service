@@ -9,6 +9,11 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Documentação da API Financeira',
     },
+    servers: [
+      {
+        url: 'http://localhost:3000/api', 
+      },
+    ],
   },
   apis: ['./src/routers/entities/*.ts'], 
 };
