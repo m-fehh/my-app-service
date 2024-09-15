@@ -1,6 +1,8 @@
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+import { userSchema } from './schemas/userSchema';
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -14,6 +16,11 @@ const swaggerOptions = {
         url: 'http://localhost:3000/api', 
       },
     ],
+  },
+  components: {
+    schemas: {
+      User: userSchema,
+    },
   },
   apis: ['./src/routers/entities/*.ts'], 
 };
