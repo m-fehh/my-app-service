@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelizeMaster } from '../config/database'; 
+import { sequelizeMaster } from '../config/database';
 import bcrypt from 'bcrypt';
 
 // Interface para o User Model com campos obrigatórios e opcionais
@@ -9,6 +9,7 @@ interface UserAttributes {
   email: string;
   password: string;
   isActive?: boolean;
+ 
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -31,15 +32,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     return bcrypt.compare(password, this.password);
   }
 
-  // Método para definir a senha com hash
-  public async setPassword(password: string): Promise<void> {
+  // Método para definir a senha com hash (usado em hooks)
+  public static async hashPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(password, salt);
-  }
-
-  // Método para verificar se o usuário está ativo
-  public isActiveUser(): boolean {
-    return this.isActive ?? true;
+    return bcrypt.hash(password, salt);
   }
 }
 
@@ -104,6 +100,11 @@ User.init(
     schema: 'app',
     timestamps: true,
     hooks: {
+      beforeSave: async (user: User) => {
+        if (user.changed('password')) {
+          user.password = await User.hashPassword(user.password);
+        }
+      },
       // Hook para garantir que o índice de unicidade não cause conflitos
       beforeSync: async () => {
         try {
@@ -112,10 +113,14 @@ User.init(
             BEGIN
               ALTER TABLE app.users ADD CONSTRAINT UQ_username UNIQUE (username);
             END;
+            IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'UQ_email' AND object_id = OBJECT_ID('app.users'))
+            BEGIN
+              ALTER TABLE app.users ADD CONSTRAINT UQ_email UNIQUE (email);
+            END;
           `);
-          console.log('Índice UQ_username verificado com sucesso.');
+          console.log('Índices verificados com sucesso.');
         } catch (error) {
-          console.error('Erro ao verificar ou criar o índice UQ_username:', error);
+          console.error('Erro ao verificar ou criar índices:', error);
         }
       },
     },

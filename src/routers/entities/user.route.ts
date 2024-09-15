@@ -6,6 +6,7 @@ import {
   updateUser,
   deleteUser,
   authenticateUser,
+  refreshJwt,
   deactivateUser
 } from '../../controllers/user.controller';
 
@@ -212,6 +213,44 @@ router.delete('/users/:id', deleteUser);
  *         description: Erro ao autenticar usuário
  */
 router.post('/auth/login', authenticateUser);
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Atualizar o JWT usando um refresh token
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Refresh token fornecido
+ *             required:
+ *               - refreshToken
+ *     responses:
+ *       200:
+ *         description: Token atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Novo token JWT gerado
+ *       400:
+ *         description: Dados inválidos
+ *       401:
+ *         description: Refresh token inválido ou expirado
+ *       500:
+ *         description: Erro ao atualizar token
+ */
+router.post('/auth/refresh-token', refreshJwt);
 
 /**
  * @swagger
