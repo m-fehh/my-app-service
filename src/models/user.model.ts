@@ -39,7 +39,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   // Método para verificar se o usuário está ativo
   public isActiveUser(): boolean {
-    return this.isActive ?? true; 
+    return this.isActive ?? true;
   }
 }
 
@@ -54,26 +54,37 @@ User.init(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: {
+        name: 'UQ_username',
+        msg: 'O nome de usuário deve ser único.',
+      },
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: {
+        name: 'UQ_email',
+        msg: 'O email deve ser único.',
+      },
       validate: {
-        isEmail: true,
+        isEmail: {
+          msg: 'Forneça um endereço de email válido.',
+        },
       },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [8, 100], 
+        len: {
+          args: [8, 100],
+          msg: 'A senha deve ter entre 8 e 100 caracteres.',
+        },
       },
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      allowNull: false,
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -90,8 +101,24 @@ User.init(
     sequelize: sequelizeMaster,
     modelName: 'User',
     tableName: 'users',
-    schema: 'app', 
+    schema: 'app',
     timestamps: true,
+    hooks: {
+      // Hook para garantir que o índice de unicidade não cause conflitos
+      beforeSync: async () => {
+        try {
+          await sequelizeMaster.query(`
+            IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'UQ_username' AND object_id = OBJECT_ID('app.users'))
+            BEGIN
+              ALTER TABLE app.users ADD CONSTRAINT UQ_username UNIQUE (username);
+            END;
+          `);
+          console.log('Índice UQ_username verificado com sucesso.');
+        } catch (error) {
+          console.error('Erro ao verificar ou criar o índice UQ_username:', error);
+        }
+      },
+    },
   }
 );
 

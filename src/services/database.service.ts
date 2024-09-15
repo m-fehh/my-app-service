@@ -1,8 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { sequelizeMaster, useDatabase } from '../config/database';
 import { QueryTypes } from 'sequelize';
-import fs from 'fs';
-import path from 'path';
 
 // Função para criar o banco de dados e o esquema se não existir
 const createDatabaseIfNotExists = async (databaseName: string, schemaName: string): Promise<Sequelize> => {
@@ -28,28 +26,9 @@ const createDatabaseIfNotExists = async (databaseName: string, schemaName: strin
   }
 };
 
-// Função para carregar dinamicamente os modelos da pasta models
-const loadModels = (sequelize: Sequelize) => {
-  const modelsPath = path.join(__dirname, '../models');
-  fs.readdirSync(modelsPath).forEach((file) => {
-    const modelFilePath = path.join(modelsPath, file);
-
-    if (file.endsWith('.ts') || file.endsWith('.js')) {
-      const model = require(modelFilePath).default;
-      if (model && typeof model.init === 'function') {
-        model.init(model.attributes, { sequelize });
-        console.log(`Modelo ${model.name} carregado com sucesso.`);
-      }
-    }
-  });
-};
-
 // Função para sincronizar tabelas
 const syncDatabase = async (sequelize: Sequelize) => {
   try {
-    // Carregar todos os modelos dinamicamente
-    loadModels(sequelize);
-
     // Sincronizar os modelos e tabelas
     await sequelize.sync({ alter: true });
     console.log('Tabelas sincronizadas com sucesso.');

@@ -33,10 +33,16 @@ const router = Router();
  *             properties:
  *               username:
  *                 type: string
+ *                 description: Nome de usuário
  *               email:
  *                 type: string
+ *                 description: Email do usuário
  *               password:
  *                 type: string
+ *                 description: Senha do usuário
+ *               isActive:
+ *                 type: boolean
+ *                 description: "Status ativo do usuário (padrão: true)"
  *             required:
  *               - username
  *               - email
@@ -60,6 +66,12 @@ router.post('/users', createUser);
  *     responses:
  *       200:
  *         description: Lista de todos os usuários
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
  *       500:
  *         description: Erro ao buscar usuários
  */
@@ -81,6 +93,10 @@ router.get('/users', getUsers);
  *     responses:
  *       200:
  *         description: Usuário encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: Usuário não encontrado
  *       500:
@@ -110,15 +126,23 @@ router.get('/users/:id', getUserById);
  *             properties:
  *               username:
  *                 type: string
+ *                 description: Nome de usuário
  *               email:
  *                 type: string
+ *                 description: Email do usuário
  *               password:
  *                 type: string
+ *                 description: Senha do usuário (opcional)
  *               isActive:
  *                 type: boolean
+ *                 description: Status ativo do usuário (opcional)
  *     responses:
  *       200:
  *         description: Usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Dados inválidos
  *       404:
@@ -166,14 +190,20 @@ router.delete('/users/:id', deleteUser);
  *             properties:
  *               email:
  *                 type: string
+ *                 description: Email do usuário
  *               password:
  *                 type: string
+ *                 description: Senha do usuário
  *             required:
  *               - email
  *               - password
  *     responses:
  *       200:
  *         description: Autenticação bem-sucedida
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Dados inválidos
  *       401:
@@ -199,6 +229,10 @@ router.post('/auth/login', authenticateUser);
  *     responses:
  *       200:
  *         description: Usuário desativado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: Usuário não encontrado
  *       500:
